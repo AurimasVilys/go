@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+package scootin.grpc.proto;
+
+option go_package = "scootin.internal.grpc.proto/";
+
+import "google/protobuf/timestamp.proto";
+
+enum Event {
+  UPDATE = 0;
+  TRIP_START = 1;
+  TRIP_END = 2;
+}
+
+message ScooterEvent {
+  string identifier = 1;
+  string scooter_identifier = 2;
+  google.protobuf.Timestamp timestamp = 3;
+  float latitude = 4;
+  float longitude = 5;
+  Event event = 6;
+}
+
+message CreateScooterEvent {
+  string scooter_identifier = 1;
+  google.protobuf.Timestamp timestamp = 2;
+  float latitude = 3;
+  float longitude = 4;
+  Event event = 5;
+}
+
+message GetScooterEvent {
+  string identifier = 1;
+}
+
+service ScooterEventService {
+  rpc Create (CreateScooterEvent) returns (ScooterEvent) {};
+  rpc Get (GetScooterEvent) returns (ScooterEvent) {};
+}
