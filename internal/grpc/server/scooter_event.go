@@ -28,10 +28,7 @@ func NewScooterEventServer(
 }
 
 func (s *ScooterEventServer) Create(ctx context.Context, event *pb.CreateScooterEvent) (*pb.ScooterEvent, error) {
-	scooter, err := s.scooterRepository.FindOneByIdentifier(ctx, event.ScooterIdentifier)
-	if err != nil {
-		panic(err)
-	}
+	scooter, _ := s.scooterRepository.FindOneByIdentifier(ctx, event.ScooterIdentifier)
 	if scooter == nil {
 		return nil, errors.New("scooter not found")
 	}
@@ -54,7 +51,7 @@ func (s *ScooterEventServer) Create(ctx context.Context, event *pb.CreateScooter
 
 	scooter.LastConfirmedLatitude = event.Latitude
 	scooter.LastConfirmedLongitude = event.Longitude
-	err = s.scooterRepository.Update(ctx, scooter)
+	err := s.scooterRepository.Update(ctx, scooter)
 	if err != nil {
 		return nil, errors.New("scooter coordinates update failed")
 	}

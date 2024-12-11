@@ -1,8 +1,8 @@
 package dto
 
 type CreateScooterDTO struct {
-	Latitude  float32 `json:"latitude"`
-	Longitude float32 `json:"longitude"`
+	Latitude  float32 `json:"latitude" validate:"required"`
+	Longitude float32 `json:"longitude"  validate:"required"`
 }
 
 type UpdateScooterDTO struct {

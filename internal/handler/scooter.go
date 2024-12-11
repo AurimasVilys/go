@@ -28,20 +28,28 @@ func NewScooterHandler(scooterRepository repository.ScooterRepositoryInterface, 
 
 func (h *ScooterHandler) CreateScooter(c echo.Context) error {
 	scooter := models.Scooter{}
-	if err := c.Bind(&scooter); err != nil {
+	createModel := dto.CreateScooterDTO{}
+	if err := c.Bind(&createModel); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, errors.New("failed to parse request body"))
 	}
 	scooter.Identifier = uuid.NewString()
+	scooter.LastConfirmedLongitude = createModel.Longitude
+	scooter.LastConfirmedLatitude = createModel.Latitude
 
-	err := h.scooterRepository.Insert(c.Request().Context(), &scooter)
+	err := h.validator.Struct(createModel)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, errors.New("failed to create scooter"))
+		return c.JSON(http.StatusUnprocessableEntity, map[string]string{"error": err.Error()})
+	}
+
+	err = h.scooterRepository.Insert(c.Request().Context(), &scooter)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err)
 	}
 	return c.JSON(http.StatusCreated, map[string]string{"identifier": scooter.Identifier})
 }
 
 func (h *ScooterHandler) PatchScooter(c echo.Context) error {
-	var updateModel dto.UpdateScooterDTO
+	updateModel := dto.UpdateScooterDTO{}
 	if err := c.Bind(&updateModel); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request payload"})
 	}
